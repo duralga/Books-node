@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои Книжные Заметки</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <header>
+        <h1>Мои Книжные Заметки</h1>
+        <nav>
+            <a href="/new">Добавить новую книгу</a>
+        </nav>
+    </header>
+
+    <main>
+        <% if (locals.error) { %>
+            <p class="error-message"><%= error %></p>
+        <% } %>
+
+        <div class="book-list">
+            <% if (books.length === 0) { %>
+                <p>Пока нет прочитанных книг. <a href="/new">Добавьте первую!</a></p>
+            <% } else { %>
+                <% books.forEach(book => { %>
+                    <div class="book-card">
+                        <% if (book.cover_url) { %>
+                            <img src="<%= book.cover_url %>" alt="Обложка книги <%= book.title %>" class="book-cover">
+                        <% } else { %>
+                            <div class="no-cover">Нет обложки</div>
+                        <% } %>
+                        <div class="book-details">
+                            <h2><%= book.title %></h2>
+                            <h3>Автор: <%= book.author %></h3>
+                            <p>Прочитано: <%= book.date_read.toLocaleDateString('ru-RU') %></p>
+                            <p>Рейтинг: <%= book.rating %>/5</p>
+                            <p class="review">Мой отзыв: <%= book.review %></p>
+                            <div class="actions">
+                                <a href="/edit/<%= book.id %>" class="btn">Редактировать</a>
+                                <form action="/delete/<%= book.id %>" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Мои Книжные Заметки</p>
+    </footer>
+</body>
+</html>

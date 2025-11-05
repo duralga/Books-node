@@ -1,9 +1,0 @@
-npm install express pg axios dotenv
-
-# .env
-# Замените MySuperSecretPassword на ваш реальный пароль от PostgreSQL!
-PG_USER=postgres
-PG_HOST=localhost
-PG_DATABASE=book_notes_db
-PG_PASSWORD=MySuperSecretPassword 
-PG_PORT=5432

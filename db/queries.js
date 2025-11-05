@@ -1,4 +1,4 @@
-// db/queries.js - Все команды SQL
+//  db                                                                                      /queries.js - Все команды SQL
 
 import pool from "./db.js"; 
 
@@ -11,7 +11,7 @@ export async function getAllBooks() {
 // 2. Читать одну книгу по ID
 export async function findBookById(id) {
     const result = await pool.query("SELECT * FROM books WHERE id = $1", [id]);
-    return result.rows[0];
+    return result.rows[0];  
 }
 
 // 3. Создать новую книгу (INSERT)
@@ -50,4 +50,4 @@ export async function updateBook(id, book) {
 // 5. Удалить книгу (DELETE)
 export async function deleteBook(id) {
     await pool.query("DELETE FROM books WHERE id = $1", [id]);
-}
+}       

@@ -1,21 +1,24 @@
-// server.js - Диспетчер и запуск сервера
-
 import express from "express";
-import path from 'path'; 
-import { fileURLToPath } from 'url';
+import * as bookService from "./services/bookService.js";
+import path from "path"; // 1. Импортируем path
+import { fileURLToPath } from 'url'; // 2. Импортируем для получения __dirname
 
-// Получение текущего пути для правильной работы в ES Modules
+// --- Инициализация для ESM (ES Modules) ---
+// 3. Получаем путь к текущему каталогу
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import * as bookService from "./services/bookService.js";
-// --- Инициализация ---
-const app = express();
-const port = 3000;
-app.set('views', path.join(__dirname, 'views'));
+// --- Конец инициализации для ESM ---
 
+
+const app = express();
+// Используем переменную PORT из .env, если она есть, иначе 3000
+const port = process.env.PORT || 3000; 
+
+// 4. Явно указываем Express, где искать EJS-шаблоны
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views")); // Указываем путь к папке views
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public"))); // Указываем путь к public
 
 // Включаем файл с настройками базы данных, чтобы он запустил Pool и проверил соединение
 import "./db/db.js"; 
@@ -25,11 +28,12 @@ import "./db/db.js";
 // 1. Главная страница (Показать все книги)
 app.get("/", async (req, res) => {
     try {
-        const books = await bookService.findAllBooks(); // Вызываем Менеджера
+        const books = await bookService.findAllBooks(); 
         res.render("index", { books: books });
     } catch (err) {
         console.error("Ошибка при загрузке главной страницы:", err);
-        res.render("index", { books: [], error: "Не удалось загрузить книги." });
+        // Обработка ошибки, если не удалось загрузить данные
+        res.render("index", { books: [], error: "Не удалось загрузить книги из Neon." }); 
     }
 });
 
@@ -45,7 +49,7 @@ app.get("/new", (req, res) => {
 // 3. Обработать добавление новой книги
 app.post("/add", async (req, res) => {
     try {
-        await bookService.createNewBook(req.body); // Вызываем Менеджера
+        await bookService.createNewBook(req.body); 
         res.redirect("/");
     } catch (err) {
         console.error("Ошибка при добавлении книги:", err);
@@ -60,7 +64,7 @@ app.post("/add", async (req, res) => {
 app.get("/edit/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        const book = await bookService.findBookById(id); // Вызываем Менеджера
+        const book = await bookService.findBookById(id); 
         if (!book) { return res.redirect("/"); }
 
         res.render("form", {
@@ -77,7 +81,7 @@ app.get("/edit/:id", async (req, res) => {
 app.post("/update/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        await bookService.updateExistingBook(id, req.body); // Вызываем Менеджера
+        await bookService.updateExistingBook(id, req.body); 
         res.redirect("/");
     } catch (err) {
         console.error("Ошибка при обновлении книги:", err);
@@ -92,7 +96,7 @@ app.post("/update/:id", async (req, res) => {
 app.post("/delete/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        await bookService.deleteExistingBook(id); // Вызываем Менеджера
+        await bookService.deleteExistingBook(id); 
         res.redirect("/");
     } catch (err) {
         console.error("Ошибка при удалении книги:", err);

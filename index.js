@@ -1,3 +1,5 @@
+// index.js
+
 import express from "express";
 import pg from "pg";
 import axios from "axios"; // Добавили axios, понадобится для API обложек

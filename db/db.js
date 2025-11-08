@@ -3,23 +3,38 @@
 import 'dotenv/config'; 
 import pg from 'pg';
 
-// Используем DATABASE_URL из .env
-const connectionString = process.env.DATABASE_URL;
+// --- Логика сборки Connection String ---
+let connectionString = process.env.DATABASE_URL;
+
+// Если DATABASE_URL не задан, собираем его из отдельных частей
+if (!connectionString) {
+    console.log("⚠️ DATABASE_URL не найдена. Попытка собрать из отдельных переменных...");
+    
+    // Получаем отдельные части из Render/окружения
+    const PGHOST = process.env.PGHOST;
+    const PGDATABASE = process.env.PGDATABASE;
+    const PGUSER = process.env.PGUSER;
+    const PGPASSWORD = process.env.PGPASSWORD;
+    const PGSSLMODE = process.env.PGSSLMODE || 'require'; // Устанавливаем require по умолчанию
+
+    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
+        // Собираем полный URL
+        connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
+    }
+}
+// -------------------------------------
 
 if (!connectionString) {
-    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Переменная DATABASE_URL не найдена в .env!");
-    // В рабочей среде лучше не останавливаться, а просто не принимать запросы к БД
-    // Но для Codespaces можно остановить, чтобы обратить внимание на ошибку
-    // process.exit(1); 
+    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось получить или собрать DATABASE_URL!");
 }
 
-// 💡 Используем объект, который принимает строку connectionString
+
+// Уменьшаем размер пула, чтобы избежать лимитов Neon (как советовали ранее)
 const pool = new pg.Pool({
     connectionString: connectionString,
-    // ВАЖНО: Node-Postgres автоматически обрабатывает SSL из URI, 
-    // но явно указать его - хорошая практика для Neon.
+    max: 5, 
     ssl: {
-        rejectUnauthorized: false // Neon требует SSL
+        rejectUnauthorized: false
     }
 });
 

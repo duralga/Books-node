@@ -1,12 +1,11 @@
 // services/bookService.js - Правила и логика
 
 import axios from "axios"; 
-import * as db from "../db/queries.js"; // Наш Складовщик (SQL)
+import * as db from "../db/queries.js"; 
 
-// --- Логика поиска обложки (Кладовщик) ---
+
+// --- Логика поиска обложки ---
 async function getCoverUrl(bookTitle, isbn) {
-    // Этот код, который ищет обложку через Open Library API, 
-    // остается таким, как мы его обсуждали.
     const searchUrl = `https://openlibrary.org/search.json?q=${encodeURIComponent(bookTitle)}`;
     const coverBaseUrl = "https://covers.openlibrary.org/b/";
     
@@ -35,18 +34,18 @@ async function getCoverUrl(bookTitle, isbn) {
 }
 
 
-// --- Функции CRUD (Менеджер) ---
+// --- Функции CRUD ---
 
 export async function findAllBooks() {
-    return await db.getAllBooks(); // Просто просим Складовщика
+    return await db.getAllBooks();
 }
 
 export async function findBookById(id) {
-    return await db.findBookById(id); // Просто просим Складовщика
+    return await db.findBookById(id);
 }
 
 export async function deleteExistingBook(id) {
-    await db.deleteBook(id); // Просто просим Складовщика
+    await db.deleteBook(id);
 }
 
 

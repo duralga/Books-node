@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои Книжные Заметки</title>
-    <!-- ИСПРАВЛЕНИЕ ПУТИ К CSS -->
     <link rel="stylesheet" href="/styles/main.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -22,25 +22,26 @@
 
         <div class="book-list">
             <% if (books.length === 0) { %>
-                <p>Пока нет прочитанных книг. <a href="/new">Добавьте первую!</a></p>
+                <p>There are no books read yet. <a href="/new">Add the first one!</a></p>
             <% } else { %>
                 <% books.forEach(book => { %>
                     <div class="book-card">
                         <% if (book.cover_url) { %>
                             <img src="<%= book.cover_url %>" alt="Обложка книги <%= book.title %>" class="book-cover">
                         <% } else { %>
-                            <div class="no-cover">Нет обложки</div>
+                            <div class="no-cover">No cover</div>
                         <% } %>
                         <div class="book-details">
                             <h2><%= book.title %></h2>
                             <h3>Автор: <%= book.author %></h3>
-                            <p>Прочитано: <%= book.date_read.toLocaleDateString('ru-RU') %></p>
+                            <!-- Преобразование объекта Date в читаемую строку -->
+                            <p>Прочитано: <%= new Date(book.date_read).toLocaleDateString('ru-RU') %></p>
                             <p>Рейтинг: <%= book.rating %>/5</p>
-                            <p class="review">Мой отзыв: <%= book.review %></p>
+                            <p class="review">My review: <%= book.review %></p>
                             <div class="actions">
-                                <a href="/edit/<%= book.id %>" class="btn">Редактировать</a>
+                                <a href="/edit/<%= book.id %>" class="btn">Edit</a>
                                 <form action="/delete/<%= book.id %>" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger">Удалить</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </div>
                         </div>

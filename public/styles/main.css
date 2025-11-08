@@ -1,0 +1,247 @@
+/* Сброс стилей и базовые настройки */
+:root {
+    --primary-color: #3b82f6; /* Яркий синий */
+    --secondary-color: #f1f5f9; /* Светлый фон */
+    --text-color: #1e293b; /* Темно-синий для текста */
+    --header-bg: #1e293b; /* Очень темный, почти черный */
+    --card-bg: #ffffff; /* Белый для карточек */
+    --danger-color: #ef4444; /* Красный для опасностей */
+    --success-color: #10b981; /* Зеленый для успеха (добавлено) */
+    --border-radius: 12px; /* Увеличенный радиус для мягкости */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Более заметная и мягкая тень */
+    --subtle-text-color: #64748b; /* Серый для второстепенного текста */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* Обновлен: Шрифт Inter, который уже был, но его необходимо подключить */
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    background-color: var(--secondary-color); /* Светлый фон */
+    color: var(--text-color);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* HEADER и NAVIGATION */
+header {
+    background-color: var(--header-bg);
+    color: white;
+    padding: 1.5rem 2rem; /* Увеличен отступ */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Более темная тень для контраста */
+}
+
+header h1 {
+    font-size: 2rem; /* Увеличенный размер */
+    font-weight: 700;
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem; /* Увеличенный отступ */
+    border: none; /* Убран бордер, чтобы навигация выглядела чище */
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color); /* Основной цвет в кнопке */
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+header nav a:hover {
+    background-color: #2563eb; /* Чуть темнее */
+    transform: translateY(-1px); /* Легкий эффект при наведении */
+}
+
+/* MAIN CONTENT */
+main {
+    padding: 2.5rem 2rem; /* Увеличен отступ */
+    max-width: 1200px; /* Увеличенная максимальная ширина */
+    margin: 0 auto;
+}
+
+/* ERROR MESSAGE (добавлено) */
+.error-message {
+    background-color: var(--danger-color);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+/* LIST STYLES (Обновление) */
+.book-list {
+    display: grid;
+    /* Увеличен минимальный размер колонки для более крупных карточек */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px; /* Увеличенный промежуток */
+}
+
+.book-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    display: flex;
+    gap: 20px; /* Увеличенный промежуток */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e2e8f0; /* Легкая граница для четкости */
+}
+
+.book-card:hover {
+    transform: translateY(-5px); /* Небольшой подъем при наведении */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); /* Более сильная тень при наведении */
+}
+
+.book-cover {
+    width: 120px; /* Немного увеличен размер обложки */
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.no-cover {
+    width: 120px;
+    height: 180px;
+    background-color: #cbd5e1; /* Более мягкий серый */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #475569;
+    border-radius: 6px;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.book-details h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+    color: var(--text-color); /* Основной цвет текста */
+    font-weight: 700;
+}
+
+.book-details h3 {
+    font-size: 1.1rem;
+    color: var(--subtle-text-color); /* Серый цвет для автора */
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+
+.book-details p {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+.review {
+    margin: 10px 0;
+    font-style: italic;
+    border-left: 4px solid var(--primary-color); /* Более заметная линия */
+    padding-left: 15px;
+    max-height: 120px; /* Немного увеличим высоту отзыва */
+    overflow: hidden;
+    color: var(--subtle-text-color);
+    font-size: 0.9rem;
+}
+
+.actions {
+    margin-top: 15px; /* Увеличен отступ */
+    display: flex;
+    gap: 10px;
+}
+
+.actions form {
+    display: flex;
+    flex-shrink: 0;
+}
+
+
+/* BUTTON STYLES (Обновление) */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.25rem; /* Увеличен отступ для кнопок */
+    text-decoration: none;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px; /* Чуть меньший радиус для кнопок */
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.btn:hover {
+    background-color: #2563eb; /* Тот же цвет, что и в шапке */
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+/* СТАРОЕ (НЕ ТРОГАЕМ) */
+/* FORM STYLES */
+.book-form {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group input[type="url"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.2rem;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+    margin-top: 2rem;
+    color: #777;
+    font-size: 0.9rem;
+}

@@ -1,4 +1,4 @@
-//  db                                                                                      /queries.js - Все команды SQL
+// db/queries.js - Все команды SQL
 
 import pool from "./db.js"; 
 
@@ -50,4 +50,4 @@ export async function updateBook(id, book) {
 // 5. Удалить книгу (DELETE)
 export async function deleteBook(id) {
     await pool.query("DELETE FROM books WHERE id = $1", [id]);
-}       
+}

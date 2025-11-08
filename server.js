@@ -23,6 +23,12 @@ app.use(express.static(path.join(__dirname, "public"))); // Указываем �
 // Включаем файл с настройками базы данных, чтобы он запустил Pool и проверил соединение
 import "./db/db.js"; 
 
+function getCurrentDate() {
+    const d = new Date();
+    // Формат YYYY-MM-DD
+    return d.toISOString().split('T')[0];
+}
+
 // --- Маршруты (GET - показать страницу, POST - обработать форму) ---
 
 // 1. Главная страница (Показать все книги)
@@ -39,10 +45,12 @@ app.get("/", async (req, res) => {
 
 // 2. Показать форму для новой книги
 app.get("/new", (req, res) => {
+    const currentDate = getCurrentDate();
     res.render("form", {
         heading: "Добавить новую книгу",
         submit: "Добавить книгу",
         book: {}, 
+        currentDate: currentDate,
     });
 });
 
@@ -56,6 +64,7 @@ app.post("/add", async (req, res) => {
         res.render("form", {
             heading: "Добавить новую книгу", submit: "Добавить книгу",
             error: "Не удалось добавить книгу.", book: req.body, 
+            currentDate: currentDate,
         });
     }
 });
@@ -70,6 +79,7 @@ app.get("/edit/:id", async (req, res) => {
         res.render("form", {
             heading: "Редактировать книгу", submit: "Сохранить изменения",
             book: book, 
+            currentDate: currentDate,
         });
     } catch (err) {
         console.error("Ошибка при загрузке книги для редактирования:", err);
@@ -88,6 +98,7 @@ app.post("/update/:id", async (req, res) => {
         res.render("form", {
             heading: "Редактировать книгу", submit: "Сохранить изменения",
             error: "Не удалось обновить книгу.", book: { id: id, ...req.body }, 
+            currentDate: currentDate,
         });
     }
 });

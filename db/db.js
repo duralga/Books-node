@@ -1,50 +1,49 @@
-// db/db.js - Настраиваем соединение с Neon
-
+// db/db.js - Database connection setup for Neon
 import 'dotenv/config'; 
 import pg from 'pg';
 
-// --- Логика сборки Connection String ---
-let connectionString = process.env.DATABASE_URL;
-
-// Если DATABASE_URL не задан, собираем его из отдельных частей
-if (!connectionString) {
-    console.log("⚠️ DATABASE_URL не найдена. Попытка собрать из отдельных переменных...");
-    
-    // Получаем отдельные части из Render/окружения
-    const PGHOST = process.env.PGHOST;
-    const PGDATABASE = process.env.PGDATABASE;
-    const PGUSER = process.env.PGUSER;
-    const PGPASSWORD = process.env.PGPASSWORD;
-    const PGSSLMODE = process.env.PGSSLMODE || 'require'; // Устанавливаем require по умолчанию
-
-    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
-        // Собираем полный URL
-        connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
+// Build connection string
+function getConnectionString() {
+    if (process.env.DATABASE_URL) {
+        return process.env.DATABASE_URL;
     }
+    
+    console.log("⚠️ DATABASE_URL not found. Building from individual variables...");
+    
+    const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+    const PGSSLMODE = process.env.PGSSLMODE || 'require';
+    
+    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
+        return `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
+    }
+    
+    return null;
 }
-// -------------------------------------
+
+const connectionString = getConnectionString();
 
 if (!connectionString) {
-    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось получить или собрать DATABASE_URL!");
+    console.error("❌ CRITICAL ERROR: Could not get DATABASE_URL!");
+    process.exit(1);
 }
 
-
-// Уменьшаем размер пула, чтобы избежать лимитов Neon (как советовали ранее)
+// Create connection pool
 const pool = new pg.Pool({
     connectionString: connectionString,
-    max: 5, 
+    max: 5,
     ssl: {
         rejectUnauthorized: false
     }
 });
 
-// Проверка: убедиться, что подключение работает
+// Test connection
 pool.connect((err, client, release) => {
     if (err) {
-        return console.error('❌ Ошибка при подключении к базе данных Neon:', err.stack);
+        console.error('❌ Database connection error:', err.stack);
+    } else {
+        console.log('✅ Connected to Neon PostgreSQL successfully!');
+        release();
     }
-    console.log('✅ Успешное подключение к Neon PostgreSQL!');
-    release(); 
 });
 
 export default pool;

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои Книжные Заметки</title>
-    <link rel="stylesheet" href="/styles/main.css"> 
+    <title>My Book Notes</title>
+    <link rel="stylesheet" href="/styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Мои Книжные Заметки</h1>
+        <h1>My Book Notes</h1>
         <nav>
-            <a href="./new">Добавить новую книгу</a>
+            <a href="./new">Add New Book</a>
         </nav>
     </header>
 
@@ -22,25 +22,27 @@
 
         <div class="book-list">
             <% if (books.length === 0) { %>
-                <p>There are no books read yet. <a href="/new">Add the first one!</a></p>
+                <div class="empty-state">
+                    <p>No books read yet.</p>
+                    <a href="/new" class="btn">Add the first one!</a>
+                </div>
             <% } else { %>
                 <% books.forEach(book => { %>
                     <div class="book-card">
                         <% if (book.cover_url) { %>
-                            <img src="<%= book.cover_url %>" alt="Обложка книги <%= book.title %>" class="book-cover">
+                            <img src="<%= book.cover_url %>" alt="Cover of <%= book.title %>" class="book-cover">
                         <% } else { %>
                             <div class="no-cover">No cover</div>
                         <% } %>
                         <div class="book-details">
                             <h2><%= book.title %></h2>
-                            <h3>Автор: <%= book.author %></h3>
-                            <!-- Преобразование объекта Date в читаемую строку -->
-                            <p>Прочитано: <%= new Date(book.date_read).toLocaleDateString('ru-RU') %></p>
-                            <p>Рейтинг: <%= book.rating %>/5</p>
-                            <p class="review">My review: <%= book.review %></p>
+                            <h3>Author: <%= book.author %></h3>
+                            <p>Read on: <%= new Date(book.date_read).toLocaleDateString('en-US') %></p>
+                            <p>Rating: <span class="rating"><%= book.rating %>/5</span></p>
+                            <p class="review"><%= book.review %></p>
                             <div class="actions">
                                 <a href="/edit/<%= book.id %>" class="btn">Edit</a>
-                                <form action="/delete/<%= book.id %>" method="POST" style="display:inline;">
+                                <form action="/delete/<%= book.id %>" method="POST">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
                             </div>
@@ -52,8 +54,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2023 Мои Книжные Заметки</p>
+        <p>&copy; 2023 My Book Notes</p>
     </footer>
 </body>
-
 </html>

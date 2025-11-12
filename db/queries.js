@@ -1,20 +1,16 @@
-// db/queries.js - Все команды SQL
-
+// db/queries.js - Database queries
 import pool from "./db.js"; 
 
-// 1. Читать все книги
 export async function getAllBooks() {
-    const result = await pool.query("SELECT * FROM books ORDER BY id ASC");
+    const result = await pool.query("SELECT * FROM books ORDER BY date_read DESC");
     return result.rows;
 }
 
-// 2. Читать одну книгу по ID
 export async function findBookById(id) {
     const result = await pool.query("SELECT * FROM books WHERE id = $1", [id]);
     return result.rows[0];  
 }
 
-// 3. Создать новую книгу (INSERT)
 export async function addBook(book) {
     const sql = `
         INSERT INTO books (title, author, review, rating, date_read, isbn, cover_url) 
@@ -30,7 +26,6 @@ export async function addBook(book) {
     return result.rows[0];
 }
 
-// 4. Обновить существующую книгу (UPDATE)
 export async function updateBook(id, book) {
     const sql = `
         UPDATE books 
@@ -47,7 +42,6 @@ export async function updateBook(id, book) {
     return result.rows[0];
 }
 
-// 5. Удалить книгу (DELETE)
 export async function deleteBook(id) {
     await pool.query("DELETE FROM books WHERE id = $1", [id]);
 }

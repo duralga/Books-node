@@ -1,50 +1,64 @@
-// db/db.js - Настраиваем соединение с Neon
-
+// db/db.js - Database connection setup for Railway PostgreSQL
 import 'dotenv/config'; 
 import pg from 'pg';
+import { initializeDatabase } from './init.js';
 
-// --- Логика сборки Connection String ---
-let connectionString = process.env.DATABASE_URL;
-
-// Если DATABASE_URL не задан, собираем его из отдельных частей
-if (!connectionString) {
-    console.log("⚠️ DATABASE_URL не найдена. Попытка собрать из отдельных переменных...");
-    
-    // Получаем отдельные части из Render/окружения
-    const PGHOST = process.env.PGHOST;
-    const PGDATABASE = process.env.PGDATABASE;
-    const PGUSER = process.env.PGUSER;
-    const PGPASSWORD = process.env.PGPASSWORD;
-    const PGSSLMODE = process.env.PGSSLMODE || 'require'; // Устанавливаем require по умолчанию
-
-    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
-        // Собираем полный URL
-        connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
+// Build connection string for Railway
+function getConnectionString() {
+    // Railway provides DATABASE_URL environment variable
+    if (process.env.DATABASE_URL) {
+        return process.env.DATABASE_URL;
     }
+    
+    console.log("⚠️ DATABASE_URL not found. Checking for individual Railway variables...");
+    
+    // Alternative: Check if Railway provides separate variables
+    const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+    
+    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
+        const port = PGPORT || '5432';
+        return `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${port}/${PGDATABASE}?sslmode=require`;
+    }
+    
+    console.error("❌ No database configuration found!");
+    console.log("💡 Make sure DATABASE_URL is set in Railway environment variables");
+    return null;
 }
-// -------------------------------------
+
+const connectionString = getConnectionString();
 
 if (!connectionString) {
-    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось получить или собрать DATABASE_URL!");
+    console.error("❌ CRITICAL: Could not get database connection string!");
+    process.exit(1);
 }
 
-
-// Уменьшаем размер пула, чтобы избежать лимитов Neon (как советовали ранее)
+// Create connection pool with Railway-optimized settings
 const pool = new pg.Pool({
     connectionString: connectionString,
-    max: 5, 
-    ssl: {
-        rejectUnauthorized: false
-    }
+    max: 10, // Railway allows more connections
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// Проверка: убедиться, что подключение работает
-pool.connect((err, client, release) => {
-    if (err) {
-        return console.error('❌ Ошибка при подключении к базе данных Neon:', err.stack);
+// Test connection and initialize database
+async function setupDatabase() {
+    try {
+        const client = await pool.connect();
+        console.log('✅ Connected to Railway PostgreSQL successfully!');
+        
+        // Initialize table if needed
+        await initializeDatabase();
+        
+        client.release();
+    } catch (error) {
+        console.error('❌ Database connection error:', error.message);
+        console.log('💡 Check your Railway environment variables and database configuration');
+        process.exit(1);
     }
-    console.log('✅ Успешное подключение к Neon PostgreSQL!');
-    release(); 
-});
+}
+
+// Run setup when module loads
+setupDatabase();
 
 export default pool;

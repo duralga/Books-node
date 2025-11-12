@@ -3,7 +3,8 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
 import * as bookService from "./services/bookService.js";
-import "./db/db.js"; // This will now initialize the database
+import path from "path"; // 1. Импортируем path
+import { fileURLToPath } from 'url'; // 2. Импортируем для получения __dirname
 
 // ESM directory setup
 const __filename = fileURLToPath(import.meta.url);
@@ -117,42 +118,8 @@ app.post("/delete/:id", async (req, res) => {
     }
 });
 
-// Health check endpoint for Railway
-app.get("/health", (req, res) => {
-    res.status(200).json({ 
-        status: "OK", 
-        message: "Server is running",
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
-    });
-});
 
-// Root endpoint redirect
-app.get("/", (req, res) => {
-    res.redirect("/");
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).render('index', {
-        books: [],
-        error: 'Internal server error. Please try again later.'
-    });
-});
-
-// 404 handler
-app.use((req, res) => {
-    res.status(404).render('index', {
-        books: [],
-        error: 'Page not found.'
-    });
-});
-
-// Start server
-app.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Server running on port ${port}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 Health check: http://localhost:${port}/health`);
-    console.log(`🏠 Home page: http://localhost:${port}/`);
+// --- Запуск сервера ---
+app.listen(port, () => {
+  console.log(`Сервер запущен на порту ${port}`);
 });

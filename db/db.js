@@ -1,64 +1,53 @@
-// db/db.js - Database connection setup for Railway PostgreSQL
+// db/db.js - Настраиваем соединение с PostgreSQL
 import 'dotenv/config'; 
 import pg from 'pg';
-import { initializeDatabase } from './init.js';
 
-// Build connection string for Railway
+// Функция для сборки Connection String
 function getConnectionString() {
-    // Railway provides DATABASE_URL environment variable
     if (process.env.DATABASE_URL) {
         return process.env.DATABASE_URL;
     }
     
-    console.log("⚠️ DATABASE_URL not found. Checking for individual Railway variables...");
+    console.log("⚠️ DATABASE_URL не найдена. Попытка собрать из отдельных переменных...");
     
-    // Alternative: Check if Railway provides separate variables
-    const { PGHOST, PGPORT, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
-    
+    const PGHOST = process.env.PGHOST;
+    const PGDATABASE = process.env.PGDATABASE;
+    const PGUSER = process.env.PGUSER;
+    const PGPASSWORD = process.env.PGPASSWORD;
+    const PGSSLMODE = process.env.PGSSLMODE || 'require';
+
     if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
-        const port = PGPORT || '5432';
-        return `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${port}/${PGDATABASE}?sslmode=require`;
+        return `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
     }
     
-    console.error("❌ No database configuration found!");
-    console.log("💡 Make sure DATABASE_URL is set in Railway environment variables");
     return null;
 }
 
+// ТОЛЬКО ОДНА переменная connectionString!
 const connectionString = getConnectionString();
 
 if (!connectionString) {
-    console.error("❌ CRITICAL: Could not get database connection string!");
+    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось получить DATABASE_URL!");
     process.exit(1);
 }
 
-// Create connection pool with Railway-optimized settings
+// Пул соединений
 const pool = new pg.Pool({
     connectionString: connectionString,
-    max: 10, // Railway allows more connections
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    max: 10,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
-// Test connection and initialize database
-async function setupDatabase() {
-    try {
-        const client = await pool.connect();
-        console.log('✅ Connected to Railway PostgreSQL successfully!');
-        
-        // Initialize table if needed
-        await initializeDatabase();
-        
-        client.release();
-    } catch (error) {
-        console.error('❌ Database connection error:', error.message);
-        console.log('💡 Check your Railway environment variables and database configuration');
-        process.exit(1);
+// Проверка подключения
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error('❌ Ошибка при подключении к базе данных:', err.stack);
+    } else {
+        console.log('✅ Успешное подключение к PostgreSQL!');
+        release(); 
     }
-}
-
-// Run setup when module loads
-setupDatabase();
+});
 
 export default pool;

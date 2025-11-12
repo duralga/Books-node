@@ -1,53 +1,33 @@
-// db/db.js - Настраиваем соединение с PostgreSQL
+// db/db.js - Оптимизированная версия для Railway
 import 'dotenv/config'; 
 import pg from 'pg';
 
-// Функция для сборки Connection String
-function getConnectionString() {
-    if (process.env.DATABASE_URL) {
-        return process.env.DATABASE_URL;
-    }
-    
-    console.log("⚠️ DATABASE_URL не найдена. Попытка собрать из отдельных переменных...");
-    
-    const PGHOST = process.env.PGHOST;
-    const PGDATABASE = process.env.PGDATABASE;
-    const PGUSER = process.env.PGUSER;
-    const PGPASSWORD = process.env.PGPASSWORD;
-    const PGSSLMODE = process.env.PGSSLMODE || 'require';
-
-    if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
-        return `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=${PGSSLMODE}`;
-    }
-    
-    return null;
-}
-
-// ТОЛЬКО ОДНА переменная connectionString!
-const connectionString = getConnectionString();
+// Railway автоматически предоставляет DATABASE_URL
+const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-    console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не удалось получить DATABASE_URL!");
+    console.error("❌ DATABASE_URL не найдена!");
+    console.log("💡 Railway должен автоматически установить DATABASE_URL");
     process.exit(1);
 }
 
-// Пул соединений
+console.log("🔗 Используем DATABASE_URL от Railway");
+
 const pool = new pg.Pool({
     connectionString: connectionString,
     max: 10,
-    ssl: {
-        rejectUnauthorized: false
+    ssl: { 
+        rejectUnauthorized: false 
     }
 });
 
-// Проверка подключения
-pool.connect((err, client, release) => {
-    if (err) {
-        console.error('❌ Ошибка при подключении к базе данных:', err.stack);
-    } else {
-        console.log('✅ Успешное подключение к PostgreSQL!');
-        release(); 
-    }
+// Улучшенная обработка ошибок
+pool.on('connect', () => {
+    console.log('✅ Подключение к PostgreSQL установлено');
+});
+
+pool.on('error', (err) => {
+    console.error('❌ Ошибка базы данных:', err.message);
 });
 
 export default pool;

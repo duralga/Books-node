@@ -3,8 +3,6 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
 import * as bookService from "./services/bookService.js";
-import path from "path"; // 1. Импортируем path
-import { fileURLToPath } from 'url'; // 2. Импортируем для получения __dirname
 
 // ESM directory setup
 const __filename = fileURLToPath(import.meta.url);
